@@ -2,24 +2,26 @@ const { handleSticker } = require('./commands/sticker')
 const { handleGroup } = require('./commands/group')
 const { handleTebakKata, handleAyoTebak } = require('./commands/tebakkata')
 const fs = require('fs')
-// tambah import
+const { handleTikTok } = require('./commands/tiktok')
 const { handleSiapaAku, handleAyoTebakSiapa } = require('./commands/tebaksiapaaku')
 const { handleTebakEmoji, handleAyoTebakEmoji } = require('./commands/tebakemoji')
 const { handleKuis, handleJawabKuis } = require('./commands/kuismtk')
 const { handleSambungKata, handleJawabSambungKata } = require('./commands/sambungkata')
 const { loadData, saveData} = require('./lib/autogroup')
+const {handleMessageStats } = require('./commands/messagecount')
+const { handleAfk, checkAfkReturn, checkAfkMention } = require('./commands/afk')
 
 async function handleCommand(sock, msg, from, body, senderName) {
-
     const prefix = '!'
-    // update fungsi handleCommand, tambah semua handler sebelum cek prefix
     await handleAyoTebak(sock, msg, from, body, senderName)
     await handleAyoTebakSiapa(sock, msg, from, body, senderName)
     await handleAyoTebakEmoji(sock, msg, from, body, senderName)
     await handleJawabKuis(sock, msg, from, body, senderName)
     await handleAyoTebak(sock, msg, from, body, senderName)
-    await handleJawabSambungKata(sock,msg,from,body,senderName
-)
+    await handleJawabSambungKata(sock,msg,from,body,senderName)
+    await checkAfkReturn( sock, msg, from)
+   
+
     if (!body || !body.startsWith(prefix)) return
 
     const [rawCmd, ...args] = body
@@ -28,6 +30,7 @@ async function handleCommand(sock, msg, from, body, senderName) {
         .split(/\s+/)
 
     const cmd = rawCmd.toLowerCase()
+    await handleMessageStats(sock, msg, from,cmd)
 
     console.log('CMD:', cmd)
 const path = require('path')
@@ -73,6 +76,16 @@ function saveAutoGroup(data) {
                     'Apa yang bisa saya bantu hari ini?\n\n' +
                     'Ketik *!menu* untuk melihat fitur yang tersedia.'
             })
+
+case 'tiktok':
+case 'tt':
+    return handleTikTok(
+        sock,
+        msg,
+        from,
+        args
+    )
+
 case 'autogroup': {
 
     const data = loadAutoGroup()
@@ -278,6 +291,10 @@ case 'offautogroup': {
 - !link
 - !resetlink
 
+👾 DOWNLOAD
+- !tiktok link
+- !tt link
+
 👾 AUTO GROUP
 - !autogroup
 
@@ -302,6 +319,12 @@ case 'offautogroup': {
 - !leaderboard — lihat peringkat
 - !poin — cek poin kamu
 
+👾 STATISTIK CHAT
+- !pesan
+- !topchat
+- !totalgrup
+- !listchat
+- !resetchat
 
 👾 *UTILITAS*
 - !ping
@@ -406,6 +429,9 @@ case 'offautogroup': {
             : '❌ Auto buka/tutup grup nonaktif'
     })
 }
+case 'afk':
+    return handleAfk( sock,msg,from,args,senderName)
+
             return sock.sendMessage(from, {
                 text:
                     `❌ Command *${cmd}* tidak ditemukan.\n\n` +

@@ -153,6 +153,119 @@ const soalList = [
         clues: ['Aku alat komunikasi genggam', 'Aku bisa untuk telepon dan internet', 'Hampir semua orang punya aku'],
         answer: 'handphone', category: 'Teknologi 📱'
     },
+    
+  {
+      clues: ['Aku adalah member pertama dari Indonesia', 'Asalku dari Denpasar, Bali', 'Aku adalah main vocalist grup'],
+      answer: 'carmen', category: 'Member 🌴'
+  },
+  {
+      clues: ['Aku adalah leader grup', 'Dulu aku seorang balerina', 'Aku sangat disiplin dan anggun'],
+      answer: 'jiwoo', category: 'Member 🍓'
+  },
+  {
+      clues: ['Aku adalah lagu debut grup', 'Judulku bertema pengejaran', 'Dirilis pada 24 Februari 2025'],
+      answer: 'the chase', category: 'Lagu 🎶'
+  },
+  {
+      clues: ['Aku adalah member termuda (maknae)', 'Spesialisasiku adalah musikal', 'Aku lahir tahun 2010'],
+      answer: 'ye-on', category: 'Member 😊'
+  },
+  {
+      clues: ['Aku adalah lagu di mini album FOCUS', 'Namaku seperti camilan manis khas Amerika', 'Aku bertema tentang cinta yang manis'],
+      answer: 'apple pie', category: 'Lagu 🍎'
+  },
+  {
+      clues: ['Aku adalah member dengan julukan All-Rounder', 'Aku sangat mahir bermain piano', 'Aku punya masa pelatihan selama 7 tahun'],
+      answer: 'yuha', category: 'Member 🎀'
+  },
+  {
+      clues: ['Aku adalah title track dari mini album pertama', 'Konsepku sangat ikonik', 'Aku memiliki versi remix oleh DJ Seinfeld'],
+      answer: 'focus', category: 'Lagu 🎯'
+  },
+  {
+      clues: ['Aku adalah main rapper dan main dancer', 'Aku bisa menahan posisi plank lebih dari 10 menit', 'Aku datang dari keluarga militer'],
+      answer: 'juun', category: 'Member 👾'
+  },
+  {
+      clues: ['Aku adalah lagu yang bold dan ekspresif', 'Judulku berteriak tentang ketidaksopanan', 'Aku dirilis pada Februari 2026'],
+      answer: 'rude!', category: 'Lagu 💥'
+  },
+  {
+      clues: ['Aku adalah member yang dikenal sebagai mood-maker', 'Dulu aku seorang model cilik', 'Posisiku adalah center'],
+      answer: 'ian', category: 'Member 🫛'
+  },
+    {
+        clues: ['Aku adalah member berdarah Korea-Kanada', 'Aku sering disebut sebagai pemilik suara malaikat', 'Aku mahir berbahasa Inggris dengan aksen Toronto'],
+        answer: 'stella', category: 'Member 🧁'
+    },
+    {
+        clues: ['Aku adalah member yang sering tampil sebagai MC di acara musik', 'Aku dikenal sangat energik di depan kamera', 'Aku adalah member visual yang suka menanam bunga matahari'],
+        answer: 'a-na', category: 'Member 🌻'
+    },
+    {
+        clues: ['Aku adalah lagu bergenre City Pop di album FOCUS', 'Namaku menggambarkan perasaan yang berdebar-debar', 'Aku adalah track ke-4 dalam EP debut mereka'],
+        answer: 'flutter', category: 'Lagu 🦋'
+    },
+    {
+        clues: ['Aku adalah lagu bergenre R&B ballad', 'Lirikku sangat melankolis dan dalam', 'Aku sangat populer di kalangan pecinta lagu galau'],
+        answer: 'blue moon', category: 'Lagu 💙'
+    },
+    {
+        clues: ['Aku adalah lagu yang membuat nama grup dikenal luas di media sosial', 'Konsepku sangat stylish dan elegan', 'Aku dirilis sebagai single sebelum mini album FOCUS'],
+        answer: 'style', category: 'Lagu 💅'
+    },
+    {
+        clues: ['Aku adalah nama fandom resmi Hearts2Hearts', 'Arti namaku adalah persatuan hati antar member dan penggemar', 'Kami selalu mendukung grup di setiap comeback'],
+        answer: 's2u', category: 'Fandom 💖'
+    },
+    {
+        clues: ['Aku adalah lagu yang terinspirasi dari kolaborasi spesial', 'Aku memiliki nuansa yang sangat ceria dan manis', 'Lagu ini sering digunakan sebagai BGM konten promosi'],
+        answer: 'pretty please', category: 'Lagu 🍭'
+    },
+    {
+        clues: ['Aku adalah julukan untuk grup yang memiliki bakat merata', 'Semua member dianggap sebagai main vocalist', 'Kami dikenal karena harmonisasi yang solid'],
+        answer: 'all-rounder group', category: 'Grup 🎤'
+    },
+    
+    {
+        clues: ['Aku adalah member yang hobi memasak di dorm', 'Aku sering membagikan resep rahasia di akun Bubble-ku', 'Aku adalah teman sekamar Jiwoo'],
+        answer: 'stella', category: 'Fakta Dorm 🏠'
+    },
+    {
+        clues: ['Aku pernah mengalami insiden kecil saat syuting MV "The Chase"', 'Aku sempat salah posisi karena terlalu bersemangat', 'Momen ini sering ditertawakan saat siaran langsung'],
+        answer: 'ian', category: 'Behind The Scene 🎥'
+    },
+    {
+        clues: ['Aku adalah member yang paling mahir dalam memecahkan rubik', 'Rekorku di bawah 30 detik', 'Aku sering melakukannya saat menunggu giliran latihan'],
+        answer: 'juun', category: 'Fakta Unik 🧠'
+    },
+    {
+        clues: ['Aku adalah member yang sering membuat desain aksesoris untuk member lain', 'Karyaku sering terlihat dalam gaya fashion grup di bandara', 'Aku sangat menyukai warna pastel'],
+        answer: 'yuha', category: 'Fakta Unik 🎀'
+    },
+    {
+        clues: ['Aku adalah member yang paling cepat bangun di pagi hari', 'Aku biasanya sudah menyiapkan sarapan untuk member lainnya', 'Aku adalah "ibu" di grup'],
+        answer: 'jiwoo', category: 'Fakta Dorm 🏠'
+    },
+    {
+        clues: ['Aku memiliki kebiasaan mengoleksi buku puisi di setiap negara yang dikunjungi', 'Aku sering membacakan kutipan puisi saat menutup konser', 'Aku sangat suka dengan suasana senja'],
+        answer: 'carmen', category: 'Fakta Unik 🌴'
+    },
+    {
+        clues: ['Aku adalah member yang paling sering terlihat membawa kamera analog', 'Aku mendokumentasikan keseharian member di balik layar', 'Hasil fotoku sering diunggah di akun Instagram resmi grup'],
+        answer: 'a-na', category: 'Fakta Unik 🌻'
+    },
+    {
+        clues: ['Aku adalah member yang paling takut dengan ketinggian', 'Itu sebabnya aku paling gugup saat syuting adegan di gedung tinggi MV "FOCUS"', 'Member lain harus terus memegang tanganku saat syuting'],
+        answer: 'ye-on', category: 'Behind The Scene 🎥'
+    },
+    {
+    clues: ['Aku adalah penggemar berat Juun di Hearts2Hearts', 'Aku tidak pernah melewatkan *fancam* "cewek ganteng" itu', 'Ketangguhan dukunganku membuatku dijuluki si paling setia'],
+    answer: 'tegar', category: 'Fans Fanatik 💖'
+}
+
+
+
 ]
 
 // ================================
@@ -247,10 +360,14 @@ async function sendClue(sock, groupId, clueIdx) {
     }
 
     text +=
-        `\n⏳ Sisa waktu: *${remaining} detik*\n` +
-        `Ketik *ayo tebak siapa jawaban* untuk menebak!`
+    `\n⏳ Sisa waktu: *${remaining} detik*\n` +
+    `📌 Reply pesan ini untuk menjawab`
 
-    await sock.sendMessage(groupId, { text })
+    const sent = await sock.sendMessage(groupId, {
+    text
+})
+
+session.questionId = sent.key.id
 }
 
 // ================================
@@ -302,7 +419,7 @@ async function handleSiapaAku(sock, msg, from, cmd, args, senderName) {
                     `⚠️ Game sedang berlangsung!\n` +
                     `📝 Soal *${s.currentIndex + 1}/${TOTAL_SOAL}*\n` +
                     `⏳ Sisa waktu: *${remaining} detik*\n\n` +
-                    `Ketik *ayo tebak siapa jawaban* untuk ikut!`
+                    `📌 Reply pesan clue untuk menjawab.`
             })
         }
 
@@ -329,7 +446,7 @@ async function handleSiapaAku(sock, msg, from, cmd, args, senderName) {
                 `✅ Jawaban benar: *+${POINTS_CORRECT} poin*\n` +
                 `❌ Jawaban salah: *${POINTS_WRONG} poin*\n` +
                 `💀 Salah *${MAX_WRONG}x*: tersingkir dari soal itu\n\n` +
-                `Ketik *ayo tebak siapa jawaban* untuk menebak!\n` +
+                `📌 Reply pesan clue untuk menjawab.\n` +
                 `━━━━━━━━━━━━━━━━━━\n` +
                 `⏳ Soal pertama dalam 3 detik...`
         })
@@ -355,17 +472,21 @@ async function handleAyoTebakSiapa(sock, msg, from, body, senderName) {
     const session = sessions[from]
     if (!session) return
 
-    const lowerBody = body.toLowerCase().trim()
-    if (!lowerBody.startsWith('ayo tebak siapa')) return
+   if (!msg.message?.extendedTextMessage)
+    return
 
-    const guess = lowerBody.replace('ayo tebak siapa', '').replace(/[<>]/g, '').trim()
+const quotedId =
+    msg.message.extendedTextMessage
+        ?.contextInfo
+        ?.stanzaId
 
-    if (!guess) {
-        return sock.sendMessage(from, {
-            text: `⚠️ @${senderId.split('@')[0]} Tulis jawabannya!\nContoh: *ayo tebak siapa panda*`,
-            mentions: [senderId]
-        })
-    }
+if (quotedId !== session.questionId)
+    return
+
+const guess =
+    body.toLowerCase().trim()
+
+   if (!guess) return
 
     if (!session.players[senderId]) {
         getPlayerData(from, senderId, senderName)
@@ -389,7 +510,9 @@ async function handleAyoTebakSiapa(sock, msg, from, body, senderName) {
     const player = session.players[senderId]
     const remaining = Math.ceil((session.endTime - Date.now()) / 1000)
 
-    if (guess === session.current.answer) {
+    if (
+    guess.trim().toLowerCase() ===
+    session.current.answer.trim().toLowerCase()) {
         session.answered = true
         session.roundScore[senderId].total += POINTS_CORRECT
         session.clueTimers?.forEach(t => clearTimeout(t))

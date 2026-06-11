@@ -72,7 +72,25 @@ const soalList = [
     { emoji: '🐓⏰🌅', answer: 'ayam berkokok pagi', hint: 'Pagi hari' },
     { emoji: '🎯🏹🎪', answer: 'panahan', hint: 'Olahraga' },
     { emoji: '🔑🏠❤️', answer: 'rumah impian', hint: 'Impian' },
+    { emoji: '🌴', answer: 'carmen', hint: 'Main Vocalist, asal Indonesia' },
+    { emoji: '🍓', answer: 'jiwoo', hint: 'Leader, mantan balerina' },
+    { emoji: '🎀', answer: 'yuha', hint: 'All-Rounder, jago piano' },
+    { emoji: '🧁', answer: 'stella', hint: 'Vokalis, berdarah Korea-Kanada' },
+    { emoji: '👾', answer: 'juun', hint: 'Main Rapper & Dancer' },
+    { emoji: '🌻', answer: 'a-na', hint: 'Visual, energik, MC musik' },
+    { emoji: '🫛', answer: 'ian', hint: 'Center, mood-maker' },
+    { emoji: '😊', answer: 'ye-on', hint: 'Maknae, jago musikal' },
+    { emoji: '🏃‍♀️💨🔍', answer: 'the chase', hint: 'Lagu debut mereka' },
+    { emoji: '💅✨👠', answer: 'style', hint: 'Lagu ekspresif dan penuh percaya diri' },
+    { emoji: '🚫😤💥', answer: 'rude', answer_id: 'RUDE!', hint: 'Lagu terbaru yang bold' },
+    { emoji: '🎯👀🔥', answer: 'focus', hint: 'Title track dari mini album pertama' },
+    { emoji: '🍭🎀✨', answer: 'pretty please', hint: 'Lagu kolaborasi/promo Pokémon' },
+    { emoji: '🍎🥧👩‍🍳', answer: 'apple pie', hint: 'Lagu ceria tentang cinta manis' },
+    { emoji: '💙🌙✨', answer: 'blue moon', hint: 'Lagu bergenre R&B ballad' },
+    { emoji: '🦋✨🌸', answer: 'fultter', hint: 'Lagu bergenre City Pop' },
+    { emoji: '🎯🧠🔗', answer: 'focus', hint: 'Title track dari album ini' }
 ]
+
 
 // ================================
 // CONFIG
@@ -82,6 +100,13 @@ const SOAL_DURATION = 60 * 1000
 const MAX_WRONG = 3
 const POINTS_CORRECT = 10
 const POINTS_WRONG = -5
+
+const normalize = text =>
+    text
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '')
+
+
 
 const sessions = {}
 
@@ -134,14 +159,16 @@ async function nextSoal(sock, groupId) {
 
     const remaining = Math.ceil((session.endTime - Date.now()) / 1000)
 
-    await sock.sendMessage(groupId, {
-        text:
-            `🎭 *TEBAK EMOJI — Soal ${session.currentIndex + 1}/${TOTAL_SOAL}*\n\n` +
-            `${soal.emoji}\n\n` +
-            `💡 Hint: *${soal.hint}*\n` +
-            `⏳ Waktu: *${remaining} detik*\n\n` +
-            `Ketik *ayo tebak emoji jawaban* untuk menebak!`
-    })
+   const sent = await sock.sendMessage(groupId, {
+    text:
+        `🎭 *TEBAK EMOJI — Soal ${session.currentIndex + 1}/${TOTAL_SOAL}*\n\n` +
+        `${soal.emoji}\n\n` +
+        `💡 Hint: *${soal.hint}*\n` +
+        `⏳ Waktu: *${remaining} detik*\n\n` +
+        `📌 Reply pesan ini untuk menjawab`
+})
+
+session.questionId = sent.key.id
 }
 
 async function endGame(sock, groupId) {
@@ -212,7 +239,7 @@ async function handleTebakEmoji(sock, msg, from, cmd, args, senderName) {
                 `✅ Benar: *+${POINTS_CORRECT} poin*\n` +
                 `❌ Salah: *${POINTS_WRONG} poin*\n` +
                 `💀 Salah *${MAX_WRONG}x*: tersingkir dari soal itu\n\n` +
-                `Ketik *ayo tebak emoji jawaban* untuk menebak!\n` +
+                `📌 Reply pesan soal untuk menjawab.\n` +
                 `━━━━━━━━━━━━━━━━━━\n` +
                 `⏳ Soal pertama dalam 3 detik...`
         })
@@ -234,10 +261,14 @@ async function handleAyoTebakEmoji(sock, msg, from, body, senderName) {
     const session = sessions[from]
     if (!session) return
 
-    const lowerBody = body.toLowerCase().trim()
-    if (!lowerBody.startsWith('ayo tebak emoji')) return
+    const quoted =
+    msg.message?.extendedTextMessage?.contextInfo?.stanzaId
 
-    const guess = lowerBody.replace('ayo tebak emoji', '').replace(/[<>]/g, '').trim()
+if (!quoted) return
+
+if (quoted !== session.questionId) return
+
+const guess = body.toLowerCase().trim()
 
     if (!guess) {
         return sock.sendMessage(from, {
@@ -268,7 +299,10 @@ async function handleAyoTebakEmoji(sock, msg, from, body, senderName) {
     const player = session.players[senderId]
     const remaining = Math.ceil((session.endTime - Date.now()) / 1000)
 
-    if (guess === session.current.answer) {
+    if (
+    normalize(guess) ===
+    normalize(session.current.answer)
+) {
         session.answered = true
         session.roundScore[senderId].total += POINTS_CORRECT
         clearTimeout(session.timer)

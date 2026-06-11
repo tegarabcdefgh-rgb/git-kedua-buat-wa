@@ -258,14 +258,16 @@ async function nextSoal(sock, groupId) {
         setTimeout(() => nextSoal(sock, groupId), 3000)
     }, SOAL_DURATION)
 
-    await sock.sendMessage(groupId, {
-        text:
-            `📝 *SOAL ${session.currentIndex + 1} dari ${TOTAL_SOAL}*\n\n` +
-            `💡 Petunjuk: *${soal.hint}*\n` +
-            `🔤 Kata (${soal.word.length} huruf): *${getMaskedWord(soal.word)}*\n` +
-            `⏳ Waktu: *1 menit*\n\n` +
-            `Ketik *ayo tebak jawaban* untuk menebak!`
-    })
+    const sent = await sock.sendMessage(groupId, {
+    text:
+        `📝 *SOAL ${session.currentIndex + 1} dari ${TOTAL_SOAL}*\n\n` +
+        `💡 Petunjuk: *${soal.hint}*\n` +
+        `🔤 Kata (${soal.word.length} huruf): *${getMaskedWord(soal.word)}*\n` +
+        `⏳ Waktu: *1 menit*\n\n` +
+        `📌 Reply pesan ini untuk menjawab`
+})
+
+session.questionId = sent.key.id
 }
 
 // ================================
@@ -337,7 +339,7 @@ async function handleTebakKata(sock, msg, from, cmd, args, senderName) {
                     `💡 Petunjuk: ${session.currentHint}\n` +
                     `🔤 Kata (${session.currentWord.length} huruf): *${getMaskedWord(session.currentWord)}*\n` +
                     `⏳ Sisa waktu: *${remaining} detik*\n\n` +
-                    `Ketik *ayo tebak jawaban* untuk ikut bermain!`
+                    `Reply pesan soal untuk menjawab.!`
             })
         }
 
@@ -366,7 +368,7 @@ async function handleTebakKata(sock, msg, from, cmd, args, senderName) {
                 `✅ Jawaban benar: *+${POINTS_CORRECT} poin*\n` +
                 `❌ Jawaban salah: *${POINTS_WRONG} poin*\n` +
                 `💀 Salah *${MAX_WRONG}x*: tersingkir dari soal itu\n\n` +
-                `Ketik *ayo tebak jawaban* untuk menebak!\n\n` +
+                `📌 Reply pesan soal untuk menjawab.\n\n` +
                 `━━━━━━━━━━━━━━━━━━\n` +
                 `⏳ Soal pertama dalam 3 detik...`
         })
@@ -431,21 +433,23 @@ async function handleAyoTebak(sock, msg, from, body, senderName) {
 
     if (!session) return
 
-    const lowerBody = body.toLowerCase().trim()
-    if (!lowerBody.startsWith('ayo tebak')) return
+    if (!msg.message?.extendedTextMessage)
+    return
 
-    const guess = lowerBody
-        .replace('ayo tebak', '')
-        .replace(/[<>]/g, '')
-        .trim()
+const quotedId =
+    msg.message.extendedTextMessage
+        ?.contextInfo
+        ?.stanzaId
+
+if (quotedId !== session.questionId)
+    return
+
+const guess =
+    body.toLowerCase().trim()
 
     if (!guess) {
-        return sock.sendMessage(from, {
-            text: `⚠️ @${senderId.split('@')[0]} Tulis jawabannya!\nContoh: *ayo tebak kucing*`,
-            mentions: [senderId]
-        })
-    }
-
+    return
+}
     // inisialisasi player
     if (!session.players[senderId]) {
         getPlayerData(from, senderId, senderName)

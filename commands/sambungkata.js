@@ -141,51 +141,84 @@ kehilangan 1 nyawa.
 }
 
 async function endGame(sock, groupId) {
-    try {
-        const alive = game.players.filter(p => p.hp > 0)
-        let ranking = []
-        if (alive.length > 0) {
-            ranking = [
-            alive[0],...game.rankings.slice().reverse()
-    ]
-} else 
-    {ranking = [
-        ...game.rankings.slice().reverse()
-    ]
-}
-    } catch(err) {
-        console.error(
-            'ENDGAME ERROR:',
-            err
+
+    const game = games[groupId]
+
+    if (!game) return
+
+    let ranking = []
+
+    const alive =
+        game.players.filter(
+            p => p.hp > 0
         )
+
+    if (alive.length > 0) {
+
+        ranking = [
+            alive[0],
+            ...game.rankings.slice().reverse()
+        ]
+
+    } else {
+
+        ranking =
+            game.rankings.slice().reverse()
     }
 
-
-    let result = result =
+    let result =
 `🎉 PEMENANG
-👑 ${ranking[0].name}
+👑 ${ranking[0]?.name || 'Tidak ada'}
 
 🏆 HASIL AKHIR
-
 
 `
 
     ranking.forEach((p, i) => {
+
         const pos = i + 1
 
         if (pos === 1) {
-            updatePoints(groupId,p.id,p.name,50)
-            result += `🥇 ${p.name} (+50)\n`
-        }
-        else if (pos === 2) {
-            updatePoints(groupId,p.id,p.name,30)
-            result += `🥈 ${p.name} (+30)\n`
-        }
-        else if (pos === 3) {
-            updatePoints(groupId,p.id,p.name,15)
-            result += `🥉 ${p.name} (+15)\n`
-        }
-        else {
+
+            updatePoints(
+                groupId,
+                p.id,
+                p.name,
+                50
+            )
+
+            result +=
+`🥇 ${p.name} (+50)
+`
+
+        } else if (pos === 2) {
+
+            updatePoints(
+                groupId,
+                p.id,
+                p.name,
+                30
+            )
+
+            result +=
+`🥈 ${p.name} (+30)
+`
+
+        } else if (pos === 3) {
+
+            updatePoints(
+                groupId,
+                p.id,
+                p.name,
+                15
+            )
+
+            result +=
+`🥉 ${p.name} (+15)
+`
+
+        } else {
+
             const minus = pos * 5
 
             updatePoints(
@@ -195,13 +228,15 @@ async function endGame(sock, groupId) {
                 -minus
             )
 
-            result += `${pos}. ${p.name} (-${minus})\n`
+            result +=
+`${pos}. ${p.name} (-${minus})
+`
         }
     })
 
     delete games[groupId]
 
-    return sock.sendMessage(groupId,{
+    return sock.sendMessage(groupId, {
         text: result
     })
 }
@@ -399,7 +434,7 @@ ${current.hp}`
         })
 
         if (current.hp <= 0) {
-            game.rankings.unshift(current)
+            game.rankings.push(player)
         }
 
         game.turn++

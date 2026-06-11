@@ -42,8 +42,53 @@ function updatePoints(groupId, playerId, playerName, delta) {
 // GENERATE SOAL MATEMATIKA
 // ================================
 function generateSoal() {
-    const ops = ['+', '-', 'x', ':']
+    const cerita = [
+        {
+            soal: 'Elyn memiliki 5 apel lalu membeli 3 apel lagi. Berapa jumlah apel Elyn sekarang?',
+            jawaban: 8
+        },
+        {
+            soal: 'Ucup memiliki 12 permen. Ia memberikan 4 permen kepada temannya. Berapa sisa permen Ucup?',
+            jawaban: 8
+        },
+        {
+            soal: 'Dalam satu kotak terdapat 6 pensil. Jika ada 4 kotak, berapa jumlah seluruh pensil?',
+            jawaban: 24
+        },
+        {
+            soal: 'Min Jiaa membeli 20 telur dan menggunakan 5 telur untuk membuat kue. Berapa telur yang tersisa?',
+            jawaban: 15
+        },
+        {
+            soal: 'Satu mobil memiliki 4 roda. Berapa jumlah roda dari 7 mobil?',
+            jawaban: 28
+        },
+        {
+            soal: 'Seekor ayam memiliki 2 kaki. Berapa jumlah kaki dari 15 ayam?',
+            jawaban: 30
+        },
+        {
+            soal: 'raisa  memiliki uang Rp50.000. Ia membeli buku seharga Rp15.000. Berapa sisa uang Rina?',
+            jawaban: 35000
+        },
+        {
+            soal: 'Dalam sebuah kelas terdapat 18 siswa laki-laki dan 17 siswa perempuan. Berapa jumlah seluruh siswa?',
+            jawaban: 35
+        },
+        {
+            soal: 'Sebuah bus membawa 40 penumpang. Di halte berikutnya 12 orang turun. Berapa penumpang yang tersisa?',
+            jawaban: 28
+        },
+        {
+            soal: 'Toko memiliki 8 rak. Setiap rak berisi 9 buku. Berapa jumlah seluruh buku?',
+            jawaban: 72
+        }
+    ]
+
+    // peluang soal cerita lebih besar
+    const ops = ['+', '-', 'x', ':', 'cerita', 'cerita', 'cerita']
     const op = ops[Math.floor(Math.random() * ops.length)]
+
     let a, b, answer, soalText
 
     switch (op) {
@@ -53,27 +98,41 @@ function generateSoal() {
             answer = a + b
             soalText = `${a} + ${b}`
             break
+
         case '-':
             a = Math.floor(Math.random() * 100) + 50
             b = Math.floor(Math.random() * 50) + 1
             answer = a - b
             soalText = `${a} - ${b}`
             break
+
         case 'x':
             a = Math.floor(Math.random() * 20) + 1
             b = Math.floor(Math.random() * 20) + 1
             answer = a * b
             soalText = `${a} x ${b}`
             break
+
         case ':':
             b = Math.floor(Math.random() * 19) + 2
             answer = Math.floor(Math.random() * 20) + 1
             a = b * answer
             soalText = `${a} : ${b}`
             break
+
+        case 'cerita':
+            const randomCerita =
+                cerita[Math.floor(Math.random() * cerita.length)]
+
+            answer = randomCerita.jawaban
+            soalText = randomCerita.soal
+            break
     }
 
-    return { soalText, answer: answer.toString() }
+    return {
+        soalText,
+        answer: answer.toString()
+    }
 }
 
 // ================================
