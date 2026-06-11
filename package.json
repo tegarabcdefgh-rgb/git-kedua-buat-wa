@@ -12,6 +12,7 @@
   "type": "commonjs",
   "dependencies": {
     "@hapi/boom": "^10.0.1",
+    "@tobyg74/tiktok-api-dl": "^1.1.4",
     "@whiskeysockets/baileys": "^7.0.0-rc13",
     "axios": "^1.17.0",
     "dotenv": "^17.4.2",

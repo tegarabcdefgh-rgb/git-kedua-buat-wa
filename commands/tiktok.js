@@ -1,114 +1,51 @@
-const axios = require('axios')
-
-async function resolveTikTokURL(shortUrl) {
-    try {
-        const res = await axios.get(shortUrl, {
-            maxRedirects: 10,
-            validateStatus: (status) => status < 400
-        })
-        return res.request.res.responseUrl || shortUrl
-    } catch (err) {
-        return shortUrl
-    }
-}
+// commands/tiktok.js
+const Tiktok = require("@tobyg74/tiktok-api-dl");
 
 async function handleTikTok(sock, msg, from, args) {
-
+    // Validasi URL
     if (!args[0]) {
-        return sock.sendMessage(
-            from,
-            {
-                text:
-`❌ Masukkan link TikTok
-
-Contoh:
-!tiktok https://vt.tiktok.com/xxxx`
-            },
-            { quoted: msg }
-        )
+        return sock.sendMessage(from, {
+            text: `❌ Masukkan link TikTok.\nContoh: !tiktok https://vt.tiktok.com/xxxx`
+        }, { quoted: msg });
     }
 
-    let videoUrl = args[0]
-
+    let videoUrl = args[0];
     if (!videoUrl.includes('tiktok.com')) {
-        return sock.sendMessage(
-            from,
-            { text: '❌ Link TikTok tidak valid.' },
-            { quoted: msg }
-        )
+        return sock.sendMessage(from, {
+            text: '❌ Link TikTok tidak valid.'
+        }, { quoted: msg });
     }
+
+    // Kirim pesan proses
+    await sock.sendMessage(from, {
+        text: '⏳ Sedang mengambil video TikTok...'
+    }, { quoted: msg });
 
     try {
+        // Gunakan pustaka baru
+        const result = await Tiktok.Downloader(videoUrl, {
+            version: "v1" // atau "v2", "v3". coba v1 dulu
+        });
 
-        await sock.sendMessage(
-            from,
-            { text: '⏳ Sedang mengambil video TikTok...' },
-            { quoted: msg }
-        )
-
-        // ✅ FIX 1: Resolve URL pendek dulu
-        if (
-            videoUrl.includes('vt.tiktok.com') ||
-            videoUrl.includes('vm.tiktok.com')
-        ) {
-            videoUrl = await resolveTikTokURL(videoUrl)
-            console.log('Resolved URL:', videoUrl)
-        }
-
-        const response = await axios.get(
-            'https://tiktok-video-downloader-api.p.rapidapi.com/media',
-            {
-                params: {
-                    url: videoUrl  // ✅ FIX 2: ganti 'videoUrl' → 'url'
-                },
-                headers: {
-                    'x-rapidapi-key': process.env.RAPID_API_KEY,
-                    'x-rapidapi-host': 'tiktok-video-downloader-api.p.rapidapi.com'
-                }
-            }
-        )
-
-        console.log('TIKTOK API RESPONSE:', response.data)
-
-        const downloadUrl = response.data.downloadUrl
-
-        if (!downloadUrl) {
-            return sock.sendMessage(
-                from,
-                {
-                    text: '❌ Video tidak ditemukan atau API tidak mengembalikan link video.'
-                },
-                { quoted: msg }
-            )
-        }
-
-        await sock.sendMessage(
-            from,
-            {
+        if (result && result.status === 'success' && result.result) {
+            const downloadUrl = result.result.video;
+            await sock.sendMessage(from, {
                 video: { url: downloadUrl },
                 mimetype: 'video/mp4',
-                caption: '✅ TikTok berhasil diunduh'
-            },
-            { quoted: msg }
-        )
-
+                caption: `✅ TikTok berhasil diunduh!\n\nDeskripsi: ${result.result.desc || '-'}`
+            }, { quoted: msg });
+        } else {
+            await sock.sendMessage(from, {
+                text: '❌ Gagal mengunduh video. Mungkin tautan tidak valid atau server sedang sibuk.'
+            }, { quoted: msg });
+        }
     } catch (err) {
-
-        console.error('TIKTOK ERROR:', err.response?.data || err)
-
-        await sock.sendMessage(
-            from,
-            {
-                text:
-`❌ Gagal mengunduh video TikTok.
-
-${err.response?.data?.message || err.message}`
-            },
-            { quoted: msg }
-        )
+        console.error('TIKTOK ERROR:', err);
+        // Kirim pesan error detail (untuk debug)
+        await sock.sendMessage(from, {
+            text: `❌ Terjadi kesalahan: ${err.message || 'Gagal mengunduh video TikTok.'}`
+        }, { quoted: msg });
     }
 }
 
-module.exports = {
-    handleTikTok
-}
+module.exports = { handleTikTok };
