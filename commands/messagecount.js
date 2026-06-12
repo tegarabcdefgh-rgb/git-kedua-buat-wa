@@ -54,14 +54,17 @@ function addMessage(
         }
     }
 
-    data[groupId][userId].name =
-        userName
+    if (
+        typeof data[groupId][userId].count !== 'number'
+    ) {
+        data[groupId][userId].count = 0
+    }
 
+    data[groupId][userId].name = userName
     data[groupId][userId].count++
 
     saveData(data)
 }
-
 // ======================
 // SINKRON MEMBER
 // ======================
@@ -87,6 +90,18 @@ async function syncGroupMembers(
                     p.id.split('@')[0],
                 count: 0
             }
+
+        } else {
+
+            if (
+                typeof data[groupId][p.id].count !== 'number'
+            ) {
+                data[groupId][p.id].count = 0
+            }
+
+            data[groupId][p.id].name =
+                p.notify ||
+                data[groupId][p.id].name
         }
     }
 
@@ -110,146 +125,202 @@ async function handleMessageStats(
     }
 
     // !pesan
-    if (cmd === 'pesan') {
+  if (cmd === 'pesan') {
 
-        const senderId =
-            msg.key.participant ||
-            msg.key.remoteJid
+    const senderId =
+        msg.key.participant ||
+        msg.key.remoteJid
 
-        const user =
-            data[from][senderId]
+    const user =
+        data[from][senderId]
 
-        const total =
-            user?.count || 0
+    const total =
+        user?.count || 0
 
-        return sock.sendMessage(
-            from,
-            {
-                text:
-`📨 Total Pesan
-
-👤 ${
-user?.name || 'Kamu'
-}
-
-📊 ${total} pesan`
-            }
-        )
+    return sock.sendMessage(
+        from,
+        {
+            text:
+`┌──「 📨 *STATISTIK PESAN* 」
+│
+│  Nama  : *${user?.name || 'Kamu'}*
+│  Pesan : *${total}*
+│
+└──────────────────`
+        }
+    )
     }
 
     // !topchat
-    if (cmd === 'topchat') {
+if (cmd === 'topchat') {
 
-        const ranking =
-            Object.values(
-                data[from]
-            )
-            .sort(
-                (a,b)=>
-                b.count-a.count
-            )
-
-        let text =
-`🏆 TOP CHAT GRUP
-
-`
-
-        ranking
-        .slice(0,10)
-        .forEach((u,i)=>{
-
-            text +=
-`${i+1}. ${u.name}
-📨 ${u.count}
-
-`
-        })
-
-        return sock.sendMessage(
-            from,
-            { text }
+    const ranking =
+        Object.values(data[from])
+        .filter(u => u.count > 0)
+        .sort((a, b) =>
+            b.count - a.count
         )
-    }
 
+    let text =
+`┌──「 🏆 *TOP CHAT GRUP* 」
+│`
+
+    ranking
+    .slice(0, 10)
+    .forEach((u, i) => {
+
+        text +=
+`\n│  ${String(i + 1)
+    .padStart(2, '0')}. ${u.name}
+│      ${u.count} pesan`
+    })
+
+    text +=
+`\n│
+└──────────────────`
+
+    return sock.sendMessage(
+        from,
+        { text }
+    )
+}
     // !totalgrup
     if (cmd === 'totalgrup') {
 
-        const users =
-            Object.values(
-                data[from]
-            )
+    const metadata =
+        await sock.groupMetadata(from)
 
-        let totalPesan = 0
+    const totalAnggota =
+        metadata.participants.length
 
-        users.forEach(u=>{
-            totalPesan += u.count
-        })
-
-        return sock.sendMessage(
-            from,
-            {
-                text:
-`📊 Statistik Grup
-
-👥 Total Member:
-${users.length}
-
-📨 Total Pesan:
-${totalPesan}`
-            }
-        )
+    const users =
+        Object.values(data[from])
+    users.forEach(u => {
+        if (typeof u.count !== 'number') {
+        u.count = 0
     }
+})
+    const aktifChat =
+        users.filter(
+            u => u.count > 0
+        ).length
 
+    const totalPesan =
+    users.reduce(
+        (sum, u) =>
+            sum + Number(u.count || 0),
+        0
+    )
+
+    return sock.sendMessage(
+        from,
+        {
+            text:
+`┌──「 📊 *STATISTIK GRUP* 」
+│
+│  Total Pesan   : *${totalPesan}*
+│  Total Anggota : *${totalAnggota}*
+│  Aktif Chat    : *${aktifChat}*
+│
+└──────────────────`
+        }
+    )
+}
     // !listchat
-    if (cmd === 'listchat') {
+// !listchat
+if (cmd === 'listchat') {
 
-        const users =
-            Object.values(
-                data[from]
-            )
-            .sort(
-                (a,b)=>
-                b.count-a.count
-            )
+    const metadata =
+        await sock.groupMetadata(from)
 
-        let text =
-`📨 LIST CHAT MEMBER
+    const totalAnggota =
+        metadata.participants.length
 
-`
-
-        users.forEach((u,i)=>{
-
-            text +=
-`${i+1}. ${u.name}
-📨 ${u.count}
-
-`
-        })
-
-        return sock.sendMessage(
-            from,
-            { text }
+    const users =
+        Object.values(data[from])
+        .sort((a, b) =>
+            b.count - a.count
         )
+
+    const aktifChat =
+        users.filter(
+            u => u.count > 0
+        ).length
+
+    const totalPesan =
+    users.reduce(
+        (sum, u) =>
+            sum + Number(u.count || 0),
+        0
+    )
+
+    const belumChat =
+        totalAnggota -
+        aktifChat
+
+    let text =
+`┌──「 📊 *STATISTIK PESAN GRUP* 」
+│
+│  Total Pesan   : *${totalPesan}*
+│  Total Anggota : *${totalAnggota}*
+│  Aktif Chat    : *${aktifChat}*
+│`
+
+    const maxShow = 30
+
+    users
+    .filter(u => u.count > 0)
+    .slice(0, maxShow)
+    .forEach((u, i) => {
+
+        text +=
+`\n│  ${String(i + 1)
+    .padStart(2, '0')}. ${u.name} — ${u.count} pesan`
+    })
+
+    if (aktifChat > maxShow) {
+
+        text +=
+`\n│  _...dan ${aktifChat - maxShow} anggota aktif lainnya_`
     }
 
-    // !resetchat
-    if (cmd === 'resetchat') {
+    if (belumChat > 0) {
 
-        data[from] = {}
-
-        saveData(data)
-
-        return sock.sendMessage(
-            from,
-            {
-                text:
-'✅ Statistik chat berhasil direset'
-            }
-        )
+        text +=
+`\n│  _...${belumChat} anggota belum pernah chat_`
     }
+
+    text +=
+`\n│
+└──────────────────`
+
+    return sock.sendMessage(
+        from,
+        { text }
+    )
 }
 
-module.exports = {
+    // !resetchat
+if (cmd === 'resetchat') {
+
+    data[from] = {}
+
+    saveData(data)
+
+    return sock.sendMessage(
+        from,
+        {
+            text:
+`┌──「 ✅ *RESET CHAT* 」
+│
+│  Statistik chat grup
+│  berhasil direset.
+│
+└──────────────────`
+        }
+    )
+}
+}module.exports = {
     addMessage,
     syncGroupMembers,
     handleMessageStats

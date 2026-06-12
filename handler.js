@@ -10,6 +10,8 @@ const { handleSambungKata, handleJawabSambungKata } = require('./commands/sambun
 const { loadData, saveData} = require('./lib/autogroup')
 const {handleMessageStats } = require('./commands/messagecount')
 const { handleAfk, checkAfkReturn, checkAfkMention } = require('./commands/afk')
+const { handleIntro } = require('./commands/intro');
+const { handleWarn } = require('./commands/warn');
 
 async function handleCommand(sock, msg, from, body, senderName) {
     const prefix = '!'
@@ -30,7 +32,12 @@ async function handleCommand(sock, msg, from, body, senderName) {
         .split(/\s+/)
 
     const cmd = rawCmd.toLowerCase()
-    await handleMessageStats(sock, msg, from,cmd)
+    
+     await handleMessageStats(sock, msg, from, cmd)
+    const statsCommands = ['pesan', 'topchat', 'totalgrup', 'listchat', 'resetchat'];
+    if (statsCommands.includes(cmd)) return;
+
+    console.log('CMD:', cmd)
 
     console.log('CMD:', cmd)
 const path = require('path')
@@ -234,41 +241,32 @@ case 'offautogroup': {
         text:'❌ Auto buka/tutup grup dimatikan'
     })
 }
-        case 'menu':
+  case 'menu':
         case 'help': {
-            const images = [
-                './assets/juunimut1.jpg',
-                './assets/juunimut2.jpg',
-                './assets/juunimut3.jpg',
-                './assets/juun14.jpg',
-                './assets/juun13.jpg',
-                './assets/juun1.jpg',
-                './assets/juun2.jpg',
-                './assets/juun3.jpg',
-                './assets/juun5.jpg',
-                './assets/juun15.jpg',
-                './assets/juun16.jpg',
-                './assets/juun6.jpg',
-                './assets/juun7.jpg',
-                './assets/juun8.jpg',
-                './assets/juunkacamata1.jpg',
-                './assets/juunkacamata2.jpg',
-                './assets/juun9.jpg',
-                './assets/juun10.jpg',
-                './assets/juun11.jpg',
-                './assets/juunlemon1.jpg',
-                './assets/juunlemon2.jpg',
-                './assets/juun12.jpg',
-                './assets/juun17.jpg',
-                './assets/juun18.jpg',
-            ]
+            const menuDir = path.join(__dirname, 'assets', 'menu');
+            let imageBuffer = null;
+            let images = [];
 
-            const randomImage = images[Math.floor(Math.random() * images.length)]
+            if (fs.existsSync(menuDir)) {
+                images = fs.readdirSync(menuDir).filter(f => /\.(jpg|jpeg|png)$/i.test(f));
+            }
 
-            return sock.sendMessage(from, {
-                image: fs.readFileSync(randomImage),
-                caption:
-`👾💜 *KIM JU-EUN (JUUN)* 💜👾
+            if (images.length > 0) {
+                const randomName = images[Math.floor(Math.random() * images.length)];
+                imageBuffer = fs.readFileSync(path.join(menuDir, randomName));
+            } else {
+                // Fallback jika folder menu kosong: coba folder assets
+                const assetsDir = path.join(__dirname, 'assets');
+                if (fs.existsSync(assetsDir)) {
+                    const fallbackImages = fs.readdirSync(assetsDir).filter(f => /\.(jpg|jpeg|png)$/i.test(f));
+                    if (fallbackImages.length > 0) {
+                        const randomName = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
+                        imageBuffer = fs.readFileSync(path.join(assetsDir, randomName));
+                    }
+                }
+            }
+
+            const caption = `👾💜 *KIM JU-EUN (JUUN)* 💜👾
 
 ━━━━━━━━━━━━━━━━━━
 
@@ -297,6 +295,23 @@ case 'offautogroup': {
 
 👾 AUTO GROUP
 - !autogroup
+- !statusautogroup
+- !setbuka
+- !settutup
+- !offautogroup
+
+👾 *INTRO GRUP*
+- !intro - lihat intro grup
+- !setintro [teks] - atur intro (admin)
+- !resetintro - reset ke format default (admin)
+
+👾 *SISTEM WARNING*
+- !warn @user [alasan] - beri peringatan (admin)
+- !unwarn @user - hapus 1 peringatan (admin)
+- !resetwarn @user - hapus semua peringatan (admin)
+- !checkwarn @user - lihat peringatan user
+- !setwarnlimit <angka> - ubah batas maks warning
+- !warnlimit - lihat batas warning grup
 
 👾 *GAME*
 - !tebak — mulai tebak kata
@@ -328,6 +343,8 @@ case 'offautogroup': {
 
 👾 *UTILITAS*
 - !ping
+- !hi
+- !afk [alasan] — set afk
 
 👾 *INFORMASI*
 - !menu
@@ -336,19 +353,18 @@ case 'offautogroup': {
 ━━━━━━━━━━━━━━━━━━
 
 💜 JUUN siap membantu Anda!
-👾 Powered by Hearts2Hearts 👾`
-            })
+👾 Powered by Hearts2Hearts 👾`;
+
+            if (imageBuffer) {
+                return sock.sendMessage(from, { image: imageBuffer, caption: caption });
+            } else {
+                return sock.sendMessage(from, { text: caption });
+            }
         }
 
         case 'ping':
             return sock.sendMessage(from, {
-                text:
-`👾💜 Hai, JUUN disini!
-
-✨ Status Bot : Online
-💜 Kim Ju-eun siap membantu Anda.
-
-👾 Ketik *!menu* untuk melihat fitur yang tersedia.`
+                text: `👾💜 Hai, JUUN disini!\n\n✨ Status Bot : Online\n💜 Kim Ju-eun siap membantu Anda.\n\n👾 Ketik *!menu* untuk melihat fitur yang tersedia.`
             })
 
         // =========================
@@ -375,6 +391,13 @@ case 'offautogroup': {
             console.log('GROUP COMMAND:', cmd)
             return handleGroup(sock, msg, from, cmd, args)
 
+        case 'warn':
+        case 'unwarn':
+        case 'resetwarn':
+        case 'checkwarn':
+        case 'setwarnlimit':
+        case 'warnlimit':
+            return handleWarn(sock, msg, from,cmd, args, senderName);
         // =========================
         // GAME
         // =========================
@@ -392,52 +415,29 @@ case 'offautogroup': {
         case 'stoptebakemoji':
     return handleTebakEmoji(sock, msg, from, cmd, args, senderName)
 
+    case 'intro':
+case 'setintro':
+case 'resetintro':
+    return handleIntro(sock, msg, from, args, senderName);
+
         case 'kuis':
         case 'stopkuis':
             return handleKuis(sock, msg, from, cmd, args, senderName)
-        case 'joinsambungkata':
+                case 'joinsambungkata':
         case 'mulaipermainan':
         case 'keluarsambungkata':
         case 'statussambungkata':
         case 'stopsambungkata':
-          return handleSambungKata(sock, msg, from, cmd, args,senderName)
+            return handleSambungKata(sock, msg, from, cmd, args, senderName);
+
+        case 'afk':
+            return handleAfk(sock, msg, from, args, senderName);
+
         default:
-
-
-        case 'autogroup': {
-
-    const data = loadData()
-
-    if (!data[from]) {
-
-        data[from] = {
-            enabled: true
-        }
-
-    } else {
-
-        data[from].enabled =
-            !data[from].enabled
-    }
-
-    saveData(data)
-
-    return sock.sendMessage(from, {
-        text:
-            data[from].enabled
-            ? '✅ Auto buka/tutup grup aktif'
-            : '❌ Auto buka/tutup grup nonaktif'
-    })
-}
-case 'afk':
-    return handleAfk( sock,msg,from,args,senderName)
-
             return sock.sendMessage(from, {
-                text:
-                    `❌ Command *${cmd}* tidak ditemukan.\n\n` +
-                    `Ketik *!menu* untuk melihat daftar command.`
-            })
+                text: `❌ Command *${cmd}* tidak ditemukan.\n\n` +
+                      `Ketik *!menu* untuk melihat daftar command.`
+            });
     }
 }
-
 module.exports = { handleCommand }
