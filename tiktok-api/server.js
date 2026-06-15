@@ -8,11 +8,10 @@ const { v4: uuidv4 } = require('uuid');
 
 const execPromise = promisify(exec);
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// Gunakan yt-dlp.exe dari folder yang sama (sesuaikan jika pakai git bash)
-const ytdlp = '.\\yt-dlp.exe'; // untuk CMD Windows
-// const ytdlp = './yt-dlp.exe'; // untuk PowerShell atau Git Bash
+// Use cross-platform `yt-dlp` command; on deployment (Railway) install yt-dlp in environment
+const ytdlp = 'yt-dlp';
 
 app.use(cors());
 app.use(express.json());
@@ -69,6 +68,6 @@ app.get('/api/download-video', async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`✅ TikTok API berjalan di http://localhost:${PORT}`);
-    console.log(`📱 Contoh metadata: http://localhost:3000/api/download-tiktok?url=https://vt.tiktok.com/ZSQfvJaFC/`);
-    console.log(`📥 Contoh unduh video: http://localhost:3000/api/download-video?url=https://vt.tiktok.com/ZSQfvJaFC/`);
+    console.log(`📱 Contoh metadata: http://localhost:${PORT}/api/download-tiktok?url=https://vt.tiktok.com/ZSQfvJaFC/`);
+    console.log(`📥 Contoh unduh video: http://localhost:${PORT}/api/download-video?url=https://vt.tiktok.com/ZSQfvJaFC/`);
 });
