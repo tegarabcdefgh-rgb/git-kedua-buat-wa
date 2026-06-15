@@ -1,6 +1,9 @@
 node_modules
 npm-debug.log
+Dockerfile
+.dockerignore
 .git
-.DS_Store
+.gitignore
+auth_info
 .env
-assets/device-list-*.json
+*.log

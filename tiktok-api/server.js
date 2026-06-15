@@ -19,7 +19,9 @@ app.use(express.json());
 
 // Endpoint untuk mendapatkan metadata video
 app.get('/api/download-tiktok', async (req, res) => {
-    const videoUrl = req.query.url;
+    let videoUrl = req.query.url;
+    // sanitize input: trim and take first token in case user pasted extra text
+    videoUrl = videoUrl ? String(videoUrl).trim().split(/\s+/)[0] : videoUrl;
     if (!videoUrl) {
         return res.status(400).json({ error: 'Parameter URL diperlukan' });
     }
@@ -48,7 +50,9 @@ app.get('/api/download-tiktok', async (req, res) => {
 
 // Endpoint untuk mengunduh video (langsung mengirim file)
 app.get('/api/download-video', (req, res) => {
-    const videoUrl = req.query.url;
+    let videoUrl = req.query.url;
+    // sanitize input: trim and take first token in case user pasted extra text
+    videoUrl = videoUrl ? String(videoUrl).trim().split(/\s+/)[0] : videoUrl;
     if (!videoUrl) return res.status(400).json({ error: 'URL required' });
     if (!videoUrl.includes('tiktok.com')) return res.status(400).json({ error: 'Invalid TikTok URL' });
 

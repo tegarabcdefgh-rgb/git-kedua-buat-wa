@@ -1,11 +1,12 @@
 require('dotenv').config()
 
-const { makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys')
+const { makeWASocket, DisconnectReason } = require('@whiskeysockets/baileys')
 const { Boom } = require('@hapi/boom')
 const qrcode = require('qrcode-terminal')
 const fs = require('fs')
 const path = require('path')
 
+const { useMongoAuthState } = require('./mongo-auth-state')
 const { handleCommand } = require('./handler')
 const { addMessage, syncGroupMembers } = require('./commands/messagecount')
 const { handleGroupParticipants } = require('./commands/group')
@@ -58,7 +59,7 @@ function startAutoGroupScheduler(sock) {
 // ─────────────────────────────────────────
 
 async function startBot() {
-    const { state, saveCreds } = await useMultiFileAuthState('./auth_info')
+    const { state, saveCreds } = await useMongoAuthState()
 
     const sock = makeWASocket({
         auth: state,
