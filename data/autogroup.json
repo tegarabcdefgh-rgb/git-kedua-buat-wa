@@ -8,5 +8,10 @@
     "enabled": true,
     "open": "06:00",
     "close": "22:08"
+  },
+  "120363404182040600@g.us": {
+    "enabled": true,
+    "open": "23:41",
+    "close": "23:40"
   }
 }

@@ -1,3 +1,13 @@
+// Command yang hanya boleh dipakai admin grup (rawan bikin keributan jika dipakai sembarang orang)
+const ADMIN_ONLY_COMMANDS = ['kick', 'add', 'promote', 'demote', 'mute', 'unmute', 'resetlink', 'tagall']
+
+// Cek apakah sender adalah admin grup
+async function isSenderAdmin(metadata, msg) {
+    const sender = msg.key.participant || msg.key.remoteJid
+    const participant = metadata.participants.find(p => p.id === sender)
+    return participant?.admin === 'admin' || participant?.admin === 'superadmin'
+}
+
 async function handleGroup(sock, msg, from, cmd, args) {
 
     if (!from.endsWith('@g.us')) {
@@ -9,6 +19,16 @@ async function handleGroup(sock, msg, from, cmd, args) {
     try {
 
         const metadata = await sock.groupMetadata(from)
+
+        // ── Cek admin untuk command yang berpotensi bikin keributan ──
+        if (ADMIN_ONLY_COMMANDS.includes(cmd)) {
+            const senderIsAdmin = await isSenderAdmin(metadata, msg)
+            if (!senderIsAdmin) {
+                return sock.sendMessage(from, {
+                    text: `❌ Command *!${cmd}* hanya bisa digunakan oleh *admin grup*.`
+                })
+            }
+        }
 
         switch (cmd) {
 
