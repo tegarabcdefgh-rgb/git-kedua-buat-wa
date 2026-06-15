@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "start-server": "node tiktok-api/server.js",
+    "postinstall": "python3 -m pip install -U yt-dlp || pip3 install -U yt-dlp || python -m pip install -U yt-dlp || true",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -22,7 +23,6 @@
     "fluent-ffmpeg": "^2.1.3",
     "pino": "^10.3.1",
     "qrcode-terminal": "^0.12.0",
-    "sharp": "^0.34.5",
-    "yt-dlp-exec": "^1.1.0"
+    "sharp": "^0.34.5"
   }
 }

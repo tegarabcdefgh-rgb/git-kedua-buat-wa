@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
@@ -10,8 +10,9 @@ const execPromise = promisify(exec);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Use cross-platform `yt-dlp` command; on deployment (Railway) install yt-dlp in environment
-const ytdlp = 'yt-dlp';
+// Prefer local `yt-dlp` from `node_modules/.bin`, fallback to global `yt-dlp`
+const localYtdlp = path.join(__dirname, '..', 'node_modules', '.bin', 'yt-dlp');
+const ytdlp = fs.existsSync(localYtdlp) ? localYtdlp : 'yt-dlp';
 
 app.use(cors());
 app.use(express.json());
@@ -46,24 +47,51 @@ app.get('/api/download-tiktok', async (req, res) => {
 });
 
 // Endpoint untuk mengunduh video (langsung mengirim file)
-app.get('/api/download-video', async (req, res) => {
+app.get('/api/download-video', (req, res) => {
     const videoUrl = req.query.url;
     if (!videoUrl) return res.status(400).json({ error: 'URL required' });
     if (!videoUrl.includes('tiktok.com')) return res.status(400).json({ error: 'Invalid TikTok URL' });
 
-    const tempFile = path.join(__dirname, `temp_${uuidv4()}.mp4`);
-    try {
-        await execPromise(`${ytdlp} -o "${tempFile}" -f mp4 "${videoUrl}"`);
-        res.sendFile(tempFile, (err) => {
-            if (err) console.error('Error sending file:', err);
-            // Hapus file setelah dikirim
-            fs.unlink(tempFile, (e) => e && console.error('Error deleting temp file:', e));
-        });
-    } catch (error) {
-        console.error('Error downloading video:', error.message);
-        if (fs.existsSync(tempFile)) fs.unlinkSync(tempFile);
-        res.status(500).json({ error: 'Gagal mengunduh video', details: error.message });
-    }
+    // Stream output directly from yt-dlp to response
+    // Use output to stdout with `-o -` and binary mode
+    const args = ['-f', 'mp4', '-o', '-', videoUrl];
+    const ytdlpProc = spawn(ytdlp, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+
+    // Set headers for download
+    const filename = `tiktok_${uuidv4()}.mp4`;
+    res.setHeader('Content-Type', 'video/mp4');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    // Pipe stdout to response
+    ytdlpProc.stdout.pipe(res);
+
+    // Capture errors
+    let stderr = '';
+    ytdlpProc.stderr.on('data', (chunk) => {
+        stderr += chunk.toString();
+    });
+
+    ytdlpProc.on('error', (err) => {
+        console.error('yt-dlp spawn error:', err);
+        if (!res.headersSent) res.status(500).json({ error: 'Failed to start download process', details: err.message });
+    });
+
+    ytdlpProc.on('close', (code) => {
+        if (code !== 0) {
+            console.error('yt-dlp exited with code', code, stderr);
+            // If response not finished, send error
+            if (!res.finished) {
+                res.status(500).end();
+            }
+        }
+    });
+
+    // If client disconnects, kill the child process
+    req.on('close', () => {
+        if (!res.writableEnded) {
+            ytdlpProc.kill('SIGKILL');
+        }
+    });
 });
 
 app.listen(PORT, () => {
